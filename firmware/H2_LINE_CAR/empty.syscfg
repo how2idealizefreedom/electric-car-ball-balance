@@ -1,0 +1,126 @@
+/**
+ * H2_LINE_CAR P0 safe bring-up configuration.
+ *
+ * @cliArgs --device "MSPM0G350X" --part "Default" --package "LQFP-48(PT)" --product "mspm0_sdk@2.11.00.07"
+ * @v2CliArgs --device "MSPM0G3507" --package "LQFP-48(PT)" --product "mspm0_sdk@2.11.00.07"
+ * @versions {"tool":"1.26.2+4477"}
+ */
+
+const GPIO   = scripting.addModule("/ti/driverlib/GPIO", {}, false);
+const GPIO1  = GPIO.addInstance();
+const GPIO2  = GPIO.addInstance();
+const GPIO3  = GPIO.addInstance();
+const GPIO4  = GPIO.addInstance();
+const GPIO5  = GPIO.addInstance();
+const PWM    = scripting.addModule("/ti/driverlib/PWM", {}, false);
+const PWM1   = PWM.addInstance();
+const SYSCTL = scripting.addModule("/ti/driverlib/SYSCTL");
+const TIMER  = scripting.addModule("/ti/driverlib/TIMER", {}, false);
+const TIMER1 = TIMER.addInstance();
+const UART   = scripting.addModule("/ti/driverlib/UART", {}, false);
+const UART1  = UART.addInstance();
+
+/* LCKFB Dimengxing on-board LED, active high. */
+GPIO1.$name                         = "STATUS_LED";
+GPIO1.associatedPins.create(1);
+GPIO1.associatedPins[0].$name       = "LED";
+GPIO1.associatedPins[0].initialValue = "CLEARED";
+GPIO1.associatedPins[0].pin.$assign = "PA14";
+
+/*
+ * Global TB6612 standby. RESET is deliberate: reset, debugger halt and
+ * startup all leave the motor bridge disabled. Connect only through the
+ * approved 3.3 V -> 5 V logic-level interface.
+ */
+GPIO2.$name                         = "DRV_SAFE";
+GPIO2.associatedPins.create(1);
+GPIO2.associatedPins[0].$name       = "STBY";
+GPIO2.associatedPins[0].initialValue = "CLEARED";
+GPIO2.associatedPins[0].pin.$assign = "PB24";
+
+/* Two motor groups: A+B are right, C+D are left. */
+GPIO3.$name = "MOTOR_DIR";
+GPIO3.associatedPins.create(4);
+GPIO3.associatedPins[0].$name = "RIGHT_IN1";
+GPIO3.associatedPins[0].initialValue = "CLEARED";
+GPIO3.associatedPins[0].pin.$assign = "PA15";
+GPIO3.associatedPins[1].$name = "RIGHT_IN2";
+GPIO3.associatedPins[1].initialValue = "CLEARED";
+GPIO3.associatedPins[1].pin.$assign = "PA16";
+GPIO3.associatedPins[2].$name = "LEFT_IN1";
+GPIO3.associatedPins[2].initialValue = "CLEARED";
+GPIO3.associatedPins[2].pin.$assign = "PA17";
+GPIO3.associatedPins[3].$name = "LEFT_IN2";
+GPIO3.associatedPins[3].initialValue = "CLEARED";
+GPIO3.associatedPins[3].pin.$assign = "PA22";
+
+/* S1 is the left-most sensor when looking in the car's forward direction. */
+GPIO4.$name = "LINE_SENSOR";
+GPIO4.associatedPins.create(8);
+GPIO4.associatedPins[0].$name = "S1";
+GPIO4.associatedPins[0].direction = "INPUT";
+GPIO4.associatedPins[0].pin.$assign = "PA0";
+GPIO4.associatedPins[1].$name = "S2";
+GPIO4.associatedPins[1].direction = "INPUT";
+GPIO4.associatedPins[1].pin.$assign = "PA1";
+GPIO4.associatedPins[2].$name = "S3";
+GPIO4.associatedPins[2].direction = "INPUT";
+GPIO4.associatedPins[2].pin.$assign = "PA28";
+GPIO4.associatedPins[3].$name = "S4";
+GPIO4.associatedPins[3].direction = "INPUT";
+GPIO4.associatedPins[3].pin.$assign = "PA31";
+GPIO4.associatedPins[4].$name = "S5";
+GPIO4.associatedPins[4].direction = "INPUT";
+GPIO4.associatedPins[4].pin.$assign = "PB20";
+GPIO4.associatedPins[5].$name = "S6";
+GPIO4.associatedPins[5].direction = "INPUT";
+GPIO4.associatedPins[5].pin.$assign = "PB19";
+GPIO4.associatedPins[6].$name = "S7";
+GPIO4.associatedPins[6].direction = "INPUT";
+GPIO4.associatedPins[6].pin.$assign = "PB18";
+GPIO4.associatedPins[7].$name = "S8";
+GPIO4.associatedPins[7].direction = "INPUT";
+GPIO4.associatedPins[7].pin.$assign = "PA7";
+
+/* External button to GND; internal pull-up makes press active low. */
+GPIO5.$name = "USER_INPUT";
+GPIO5.associatedPins.create(1);
+GPIO5.associatedPins[0].$name = "START_STOP";
+GPIO5.associatedPins[0].direction = "INPUT";
+GPIO5.associatedPins[0].internalResistor = "PULL_UP";
+GPIO5.associatedPins[0].pin.$assign = "PA24";
+
+/* 32 MHz / 1600 = 20 kHz, initially 0% on both sides. */
+PWM1.$name = "MOTOR_PWM";
+PWM1.timerCount = 1600;
+PWM1.ccIndex = [0, 1];
+PWM1.timerStartTimer = false;
+PWM1.peripheral.$assign = "TIMG0";
+PWM1.peripheral.ccp0Pin.$assign = "PA12";
+PWM1.peripheral.ccp1Pin.$assign = "PA13";
+PWM1.PWM_CHANNEL_0.$name = "RIGHT_PWM";
+PWM1.PWM_CHANNEL_0.dutyCycle = 0;
+PWM1.PWM_CHANNEL_1.$name = "LEFT_PWM";
+PWM1.PWM_CHANNEL_1.dutyCycle = 0;
+
+TIMER1.$name = "CONTROL_TICK";
+TIMER1.timerMode = "PERIODIC";
+TIMER1.timerPeriod = "5 ms";
+TIMER1.timerClkPrescale = 8;
+TIMER1.interrupts = ["ZERO"];
+
+SYSCTL.forceDefaultClkConfig = true;
+SYSCTL.clockTreeEn           = true;
+
+UART1.$name                    = "DEBUG_UART";
+UART1.enableFIFO               = true;
+UART1.enableDMARX              = false;
+UART1.enableDMATX              = false;
+UART1.targetBaudRate           = 115200;
+UART1.enableInternalLoopback   = false;
+UART1.rxFifoThreshold          = "DL_UART_RX_FIFO_LEVEL_1_2_FULL";
+UART1.peripheral.$assign       = "UART0";
+UART1.peripheral.rxPin.$assign = "PA11";
+UART1.peripheral.txPin.$assign = "PA10";
+
+const Board = scripting.addModule("/ti/driverlib/Board", {}, false);
