@@ -8,7 +8,7 @@
 本仓库为 2026 年电赛 H 题「水平平台上的小球平衡小车」的完整参赛资料集合，包含：
 
 - **控制算法**：直流电机 PID 调速、底盘循迹（PID_car / LINE_CAR）、平台调平控制
-- **固件变体**：天猛星 / 迪盟两种硬件平台、循迹（H1_H5）、球平衡步进等多套工程
+- **固件变体**：天猛星（LQFP-64）/ 地猛星（LQFP-48）两种硬件平台、循迹（H1_H5）、球平衡步进、路线记忆等多套工程
 - **机械结构**：钢球平衡机构、HMG996 舵机装配的三维模型（SolidWorks）
 - **硬件资料**：WHEELTEC R1 底盘、TB6612 电机驱动、MPU6050 姿态传感器、天猛星拓展板、OLED 模块
 - **文档报告**：算法说明、电赛选拔赛资料（设计报告 / 测试报告 / 代码工程）、官方说明与答疑
@@ -23,19 +23,20 @@
 │   ├─ 电赛资料/          设计报告 / 测试报告 / 代码工程 / 仿真图
 │   ├─ dev-notes/         开发笔记（架构决策、硬件集成、开发交接）
 │   └─ 26电赛问题解答、官方说明.pdf
-├─ firmware/      源码固件（CCS / MSPM0G3507 工程，含多平台变体）
-│   ├─ H2_LINE_CAR0z              主线工程（含接线/测试指南文档）
-│   ├─ 10_DC_MOTOR_PID_1          直流电机 PID 调速
-│   ├─ 11_PID_car                 循迹小车 PID
-│   ├─ 4-testhhw                  测试工程
-│   ├─ H2_LINE_CAR                循迹小车工程
-│   ├─ H2_LINE_CAR_CURVE_TEST     弯道循迹测试
-│   ├─ H2_LINE_CAR_TIANMENG       天猛星平台版本
-│   ├─ H2_LINE_BALL_STEPPER_DIMENG     球平衡·步进·迪盟
-│   ├─ H2_LINE_BALL_STEPPER_TIANMENG   球平衡·步进·天猛星
-│   ├─ H2_TIANMENG_MEMORY_STEPPER      天猛星·记忆步进
-│   ├─ H1_H5_TIANMENG             循迹 H1/H5（天猛星）
-│   └─ H1_H5_TIANMENG_7LINE       七路循迹
+├─ firmware/      源码固件（CCS / MSPM0G3507 工程，含天猛星 LQFP-64 / 地猛星 LQFP-48 平台）
+│   ├─ 10_直流电机PID调速模板          DriverLib 空工程模板（SysConfig 初始化）
+│   ├─ 11_PID循迹小车模板             PID 循迹小车基础模板
+│   ├─ 4_地猛星_红外传感器测试         四路 / 八路红外数字输出测试
+│   ├─ H2_地猛星_循迹主线             第2问循迹主线工程（含 P0–P2 测试指南）
+│   ├─ H2_地猛星_循迹联调             第2问低速循迹联调
+│   ├─ H2_地猛星_弯道测试             第2问弯道循迹测试
+│   ├─ H2_地猛星_球平衡步进           第2问球平衡步进（地猛星板）
+│   ├─ H2_天猛星_循迹备用             第2问循迹备用工程（天猛星板）
+│   ├─ H2_天猛星_球平衡步进           第2问球平衡步进（天猛星板）
+│   ├─ H2_天猛星_路线记忆与步进       循迹 + 路线记忆回放 + 步进
+│   ├─ H1-H5_天猛星_1至5问集成        第1–5问集成工程（天猛星板）
+│   └─ H1-H5_天猛星_七路循迹          七路巡线版本（天猛星板）
+
 ├─ mechanical/    机械结构三维模型（SolidWorks：钢球平衡机构、舵机装配）
 ├─ hardware/      硬件资料（底盘、电机驱动、传感器、拓展板、PCB、OLED）
 │   └─ 电赛ti_PCB文件      TI 竞赛 PCB（Gerber / 原理图）
@@ -59,14 +60,14 @@
 
 1. 安装 [Code Composer Studio (Theia)](https://www.ti.com/tool/CCSTUDIO) 20.5 及以上版本。
 2. 导入 `firmware/` 下对应的工程（File → Import → CCS Projects）。
-3. 根据 `firmware/H2_LINE_CAR0z/` 内的 `P0_TEST_GUIDE.md` ~ `P2_FINAL_LAP_TEST.md` 依次完成接线与测试。
+3. 根据 `firmware/H2_地猛星_循迹主线/` 内的 `P0_TEST_GUIDE.md` ~ `P2_FINAL_LAP_TEST.md` 依次完成接线与测试。
 
 ## 说明
 
 - 为控制仓库体积，**大视频（*.mp4/*.avi）、压缩包（*.zip/*.rar/*.7z）和编译产物已被 `.gitignore` 忽略**，
   这些文件仍保留在本地目录中，仅供本地查阅；如需在 GitHub 上展示，请改用 Git LFS 或 Release 附件。
 - 本仓库仅用于学习与技术交流；竞赛作品的知识产权归作者所有，转载请注明出处。
-- 本仓库提交身份已设为作者 GitHub 账号；如需更改，执行 `git config user.name` / `git config user.email` 后重新提交。建议补充 `LICENSE`。
+- 本仓库提交身份已设为作者 GitHub 账号（how2idealizefreedom）；如需更改，执行 `git config user.name` / `git config user.email` 后重新提交。已附 MIT `LICENSE`。
 
 ---
 *Generated with WorkBuddy · 整理于 2026-10-09*
