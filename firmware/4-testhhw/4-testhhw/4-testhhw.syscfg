@@ -1,0 +1,57 @@
+/**
+ * LCKFB Tianmengxing MSPM0G3507 - four-channel infrared digital input test.
+ *
+ * @cliArgs --device "MSPM0G350X" --part "Default" --package "LQFP-64(PM)"
+ * @v2CliArgs --device "MSPM0G3507" --package "LQFP-64(PM)"
+ */
+
+const GPIO   = scripting.addModule("/ti/driverlib/GPIO", {}, false);
+const GPIO1  = GPIO.addInstance();
+const SYSCTL = scripting.addModule("/ti/driverlib/SYSCTL");
+const UART   = scripting.addModule("/ti/driverlib/UART", {}, false);
+const UART1  = UART.addInstance();
+
+GPIO1.$name = "GPIO_SENSORS_B";
+GPIO1.associatedPins.create(4);
+
+GPIO1.associatedPins[0].$name            = "CH1";
+GPIO1.associatedPins[0].assignedPort     = "PORTB";
+GPIO1.associatedPins[0].assignedPin      = "24";
+GPIO1.associatedPins[0].direction        = "INPUT";
+GPIO1.associatedPins[0].internalResistor = "PULL_UP";
+
+GPIO1.associatedPins[1].$name            = "CH2";
+GPIO1.associatedPins[1].assignedPort     = "PORTB";
+GPIO1.associatedPins[1].assignedPin      = "20";
+GPIO1.associatedPins[1].direction        = "INPUT";
+GPIO1.associatedPins[1].internalResistor = "PULL_UP";
+
+GPIO1.associatedPins[2].$name            = "CH3";
+GPIO1.associatedPins[2].assignedPort     = "PORTB";
+GPIO1.associatedPins[2].assignedPin      = "19";
+GPIO1.associatedPins[2].direction        = "INPUT";
+GPIO1.associatedPins[2].internalResistor = "PULL_UP";
+
+GPIO1.associatedPins[3].$name            = "CH4";
+GPIO1.associatedPins[3].assignedPort     = "PORTB";
+GPIO1.associatedPins[3].assignedPin      = "18";
+GPIO1.associatedPins[3].direction        = "INPUT";
+GPIO1.associatedPins[3].internalResistor = "PULL_UP";
+
+UART1.$name                    = "UART_0";
+UART1.targetBaudRate           = 115200;
+UART1.enableDMARX              = false;
+UART1.enableDMATX              = false;
+UART1.enableInternalLoopback   = false;
+UART1.peripheral.$assign       = "UART0";
+UART1.peripheral.rxPin.$assign = "PA11";
+UART1.peripheral.txPin.$assign = "PA10";
+
+const Board = scripting.addModule("/ti/driverlib/Board", {}, false);
+
+SYSCTL.forceDefaultClkConfig = true;
+SYSCTL.clockTreeEn           = true;
+
+Board.peripheral.$suggestSolution          = "DEBUGSS";
+Board.peripheral.swclkPin.$suggestSolution = "PA20";
+Board.peripheral.swdioPin.$suggestSolution = "PA19";

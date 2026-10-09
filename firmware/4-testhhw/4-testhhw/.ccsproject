@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<?ccsproject version="1.0"?>
+<projectOptions>
+	<ccsVariant value="50:Theia-based"/>
+	<ccsVersion value="70.5.0"/>
+	<deviceFamily value="TMS470"/>
+	<executableActions value=""/>
+	<createSlaveProjects value=""/>
+	<ignoreDefaultDeviceSettings value="true"/>
+	<ignoreDefaultCCSSettings value="true"/>
+	<templateProperties value="id=4-testhhw.projectspec.4-testhhw,buildProfile=release,isHybrid=true"/>
+	<sourceLookupPath value="${COM_TI_MSPM0_SDK_INSTALL_DIR}/source/ti/driverlib"/>
+	<connection value="common/targetdb/connections/TIXDS110_Connection.xml"/>
+	<activeTargetConfiguration value="targetConfigs/MSPM0G3507.ccxml"/>
+	<origin value="G:\4-testhhw\4-testhhw\4-testhhw.projectspec"/>
+	<filesToOpen value="README.md,4-testhhw.syscfg"/>
+</projectOptions>
