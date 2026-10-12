@@ -17,6 +17,7 @@
 Debug/
 Release/
 build/
+verified_build/
 *.o
 *.d
 *.axf
@@ -27,12 +28,24 @@ build/
 *.hex
 *.obj
 *.su
+*.crf
+
+# ===== LaTeX 中间产物 =====
+*.aux
+*.log
+*.synctex.gz
+*.toc
 
 # ===== IDE / 编辑器状态 =====
 .theia/
-.codex/
 .vscode/
+.settings/
+.cproject
+.project
+.ccsproject
+.clangd
 *.swp
+README.html
 
 # ===== 系统文件 =====
 desktop.ini
